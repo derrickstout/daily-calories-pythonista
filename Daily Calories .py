@@ -19,25 +19,39 @@ totals = {
 fields_default = deepcopy(fields)
 totals_default = deepcopy(totals)
 
+
 def reset(sender):
+	
+	global fields
+	global totals
+	
 	for i in totals:
-			v[i].text = str(totals[i])
-			v[i].text = str(totals[i])
-	for f in fields:
-			sender.superview[f].state = 'inactive'
-			#fields_default[f]['state']
-			sender.superview[f].title = str(fields_default[f]['num'])
-			sender.superview[f].tint_color = (0, 0, 0, 1)
-			sender.superview[f].image = None
+			#reset ui totals to default
+			sender.superview[i].text = str(totals_default[i])
+			#reset dict totals to default
+			totals[i] = totals_default[i]
 			#save totals dict to file
 			with open('.totals.txt', 'w') as f_totals:
 				json.dump(totals, f_totals)
+	for f in fields:
+			#reset ui fields status to default
+			sender.superview[f].state = fields_default[f]['state']
+			#set ui field num tk default
+			sender.superview[f].title = str(fields_default[f]['num'])
+			#reset ui field color to black
+			sender.superview[f].tint_color = (0, 0, 0, 1)
+			#reset ui field image to none 
+			sender.superview[f].image = None
+			#reset fields dict to default
+			fields[f] = fields_default[f]
 			#save fields dict to file
 			with open('.fields.txt', 'w') as f_fields:
 				json.dump(fields, f_fields)
-		
+
 def toggle_field(sender):
 	
+	global fields
+	global totals
 	eaten = sender.superview['eaten']
 	
 	def activate():
@@ -93,6 +107,9 @@ def toggle_field(sender):
 
 
 def button_tapped(sender):
+	
+	global fields
+	global totals
 	
 	total = sender.superview['total']
 	eaten = sender.superview['eaten']
@@ -155,18 +172,21 @@ appex.set_widget_view(v)
 
 def restoreState():
 	
+	global fields
+	global totals
+	
 	with open('.totals.txt') as f_totals:
 		totals = json.load(f_totals)
 		
-		for i in totals:
-			v[i].text = str(totals[i])
-			v[i].text = str(totals[i])
+	for i in totals:
+		v[i].text = str(totals[i])
 	
 	with open('.fields.txt') as f_fields:
 		fields = json.load(f_fields)
 	
 	for f in fields:
 		v[f].state = fields[f]['state']
+		v[f].title = str(fields[f]['num'])
 		if v[f].state == 'inactive':
 			v[f].tint_color = (0, 0, 0, 1)
 			v[f].image = None
@@ -175,6 +195,5 @@ def restoreState():
 		elif v[f].state == 'locked':
 			v[f].tint_color = (0, 0, 0, 1)
 			v[f].image = ui.Image('iob:ios7_locked_24')
-			v[f].title = str(fields[f]['num'])
 			
 restoreState()
